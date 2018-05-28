@@ -1,15 +1,14 @@
 /*
-
+######################################################
 Author: Tomaz Kastrun
 Blog Post: Native scoring in SQL Server 2017 using R
 Blog URL: tomaztsql.wordpress.com
 Date: 28.05.2018
-
+#####################################################
 */
 
 USE [master];
 GO
-
 
 CREATE DATABASE rxNativeScoring;
 GO
@@ -119,7 +118,7 @@ EXECUTE sp_execute_external_script
 
  SELECT 
   *
-  ,datalength(native_model)/1024. AS model_size_kb
+  ,DATALENGTH(native_model)/1024. AS [model_size (kb)]
 FROM arrModels;
 
 
@@ -133,7 +132,6 @@ FROM arrModels;
 
 
 -- Using sp_execute_external_script
-
 DECLARE @model VARBINARY(MAX) = (SELECT native_model FROM arrModels WHERE model_name = 'arrDelay.LM.V1')
 
 EXEC sp_execute_external_script
@@ -144,7 +142,7 @@ EXEC sp_execute_external_script
 											  data = ArrDelay_Test,
 											  #type = "response",
 											  type = "link",
-											  predVarNames = "ArrDelay_Pred",
+											  predVarNames = "ArrDelay_Pred",s
 											  extraVarsToWrite = c("ArrDelay","CRSDepTime","DayOfWeek")
 											  )'
     ,@input_data_1 = N'SELECT * FROM dbo.ArrDelay_Test'
@@ -186,3 +184,12 @@ GO
 SELECT * FROM sys.dm_server_services
 
 -- I can easly rerun the PREDICT function, whereas the sp_execute_External_script will fail
+
+
+
+-- cleaning up
+USE [master];
+GO
+
+DROP DATABASE rxNativeScoring;
+GO
